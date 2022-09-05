@@ -162,7 +162,9 @@
                                                 <td>{{ $item->name }}</td>
                                                 <td>{{ $item->category }}</td>
                                                 <td>{{ $item->description }}</td>
-                                                <td>{{ $item->image }}</td>
+                                                <td>
+                                                    <img style="width:100px;height:100px" src="{{ asset('storage/images/items/'.$item->image) }}" alt="" srcset="">
+                                                </td>
                                                 <td>{!! $item->isActive == 0
                                                     ? "<span class='badge badge-small badge-secondary'>deactivated</span>"
                                                     : "<span class='badge badge-small badge-success'>active</span>" !!}</td>

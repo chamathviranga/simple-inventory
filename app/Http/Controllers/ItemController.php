@@ -6,13 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Item;
 use App\Models\Category;
 
+use Illuminate\Support\Facades\Storage;
+
 class ItemController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth');
-    // }
-
 
     //List all items
     public function index()
@@ -42,21 +39,20 @@ class ItemController extends Controller
             'image' => 'required|mimes:jpg,jpeg,png'
         ]);
 
-        
-        if($request->hasFile('image')){
-            $newImageName = md5(time()).'.'.$request->image->extension();
-            $destination_path = 'storage/images/items';
-         //storage/folder/image.png   
-            
+
+        //if ($request->hasFile('image')) $newImageName = $request->file('image')->store('images/items');
+        if ($request->hasFile('image')) {
+
+            $storagePath = 'public/images/items';
+            $newImageName= md5(time()).'.'.$request->image->extension();
+            Storage::putFileAs($storagePath,$request->file('image'),$newImageName,'public');
         }
-                    
-    
+
         $data = $request->all();
-        //$data['image'] = "";    
+        $data['image'] = $newImageName ?? "";
         Item::create($data);
 
         return redirect()->route('item.list')->with('message', 'New Item created successfully');
-
     }
 
     //Update item
