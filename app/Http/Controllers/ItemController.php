@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Item;
 use App\Models\Category;
 
-use Illuminate\Support\Facades\Validator;
-
 class ItemController extends Controller
 {
     // public function __construct()
@@ -21,66 +19,64 @@ class ItemController extends Controller
     {
         $itemList = $this->listItems();
         $categories = $this->getCategories();
-        return view('itemList', ['itemList' => $itemList, 'categories' => $categories]);
+        return view('item-list', ['itemList' => $itemList, 'categories' => $categories]);
     }
 
     private function listItems()
     {
-        return item::paginate(10);
+        return Item::paginate(10);
     }
 
     private function getCategories()
     {
-        return category::all();
+        return Category::all();
     }
 
     //Add item
     public function add(Request $request)
     {
-
         $request->validate([
             'category' => 'required',
             'name' => 'required|string',
             'description' => 'required|string',
-            'image' => 'required|image'
+            'image' => 'required|mimes:jpg,jpeg,png'
         ]);
 
-        $item = new Item;
+        
+        if($request->hasFile('image')){
+            $newImageName = md5(time()).'.'.$request->image->extension();
+            $destination_path = 'storage/images/items';
+         //storage/folder/image.png   
+            
+        }
+                    
+    
+        $data = $request->all();
+        //$data['image'] = "";    
+        Item::create($data);
+
+        return redirect()->route('item.list')->with('message', 'New Item created successfully');
+
+    }
+
+    //Update item
+    public function update(Request $request)
+    {
+        $item = new Item();
         $item->name = $request->name;
         $item->category = $request->category;
         $item->description = $request->description;
         $item->image = "null";
         $item->isActive = 1;
-
-        $returnResponse = ['type' => 'error', 'message' => 'Faild to create new item.'];
-
-        if ($item->save()) {
-            $returnResponse['type'] = 'success';
-            $returnResponse['message'] = 'New item created successfully.';
-
-            return redirect()
-                ->back()
-                ->with('response', (object)$returnResponse);
-        } else {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('response', (object)$returnResponse);
-        }
-    }
-
-    //Update item
-    public function update() {
-        
     }
 
     //Delete item
-    public function delete() {
-
+    public function delete()
+    {
     }
 
     //Get single item
-    public function item() {
-        
+    public function item()
+    {
     }
 }
