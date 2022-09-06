@@ -7,6 +7,8 @@
     <div class="modal fade" id="addNewItem" tabindex="-1" role="dialog" aria-labelledby="addNewItemLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
+
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="addNewItemLabel">Add new item</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -14,12 +16,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="add-new-item" method="POST" action="{{ route('item.add') }}"
-                        enctype="multipart/form-data">
+                    <form id="add-new-item" method="POST" action="{{ route('item.add') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label for="category">Category</label>
-                            <select class="form-control" name="category" id="category">
+                            <select class="form-control @error('category') is-invalid @enderror" name="category"
+                                id="category">
                                 <option value="">Choose</option>
                                 @if (!empty($categories))
                                     @foreach ($categories as $category)
@@ -28,30 +30,48 @@
                                 @endif
                             </select>
 
-                            {{ CustomRenderHelper::renderError($errors, 'category') }}
-
+                            @error('category')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" name="name" id="name" class="form-control" placeholder="Keyboard">
+                            <input type="text" name="name" id="name"
+                                class="form-control @error('name') is-invalid @enderror" placeholder="Keyboard"
+                                value="{{ old('name') }}">
 
-                            {{ CustomRenderHelper::renderError($errors, 'name') }}
+                            @error('name')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea name="description" id="description" cols="5" class="form-control"
+                            <textarea name="description" id="description" cols="5"
+                                class="form-control @error('description') is-invalid @enderror"
                                 placeholder="Lorem Ipsum is simply dummy text of the printing ..."></textarea>
 
-                            {{ CustomRenderHelper::renderError($errors, 'description') }}
+                            @error('description')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label for="image">Image</label>
-                            <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                            <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
 
-                            {{ CustomRenderHelper::renderError($errors, 'image') }}
+                            @error('description')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
 
                     </form>
@@ -68,8 +88,8 @@
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-        {{ CustomRenderHelper::renderHTTPResponseMessage() }}
 
+        @include('layouts.message')
 
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -87,18 +107,6 @@
                     <!-- /.col -->
                 </div>
                 <!-- /.row -->
-
-                {{-- Display errors --}}
-                {{-- @if ($errors->any())
-                    <div class="w-100 m-auto text-center">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li class="text-danger">{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif --}}
-
 
             </div>
             <!-- /.container-fluid -->
@@ -148,58 +156,28 @@
                                     </thead>
                                     <tbody>
 
-
                                         @forelse ($itemList as $index => $item)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $item->name }}</td>
                                                 <td>{{ $item->category }}</td>
                                                 <td>{{ $item->description }}</td>
-                                                <td>{{ $item->image }}</td>
+                                                <td>
+                                                    <img style="width:100px;height:100px" src="{{ asset('storage/images/items/'.$item->image) }}" alt="" srcset="">
+                                                </td>
                                                 <td>{!! $item->isActive == 0
                                                     ? "<span class='badge badge-small badge-secondary'>deactivated</span>"
                                                     : "<span class='badge badge-small badge-success'>active</span>" !!}</td>
-                                                <td>
-                                                    
-                                                    <div class="row">
+                                                <td class="text-center">
 
-                                                        <form action="" class="m-1" method="get">
-                                                            @csrf
-                                                            @method('put')
-                                                            <input type="hidden" name="item" value="{{ $item->id }}">
-                                                            <button class="btn btn-sm btn-dark">
-                                                                <i class="fa fa-file text-primary"></i>
-                                                            </button>
-                                                        </form>
+                                                    <button class="btn btn-sm btn-dark" data-toggle="modal"
+                                                        data-target="#addNewItem">
+                                                        <i class="fa fa-file text-primary"></i>
+                                                        <span class="">Open</span>
+                                                    </button>
 
-                                                        <form action="" class="m-1" method="get">
-                                                            @csrf
-                                                            <input type="hidden" name="item" value="{{ $item->id }}">
-                                                            <button class="btn btn-sm btn-dark">
-                                                                <i class="fa fa-edit text-warning"></i>
-                                                            </button>
-                                                        </form>
-                                                           
-                                                        <form action="" class="m-1" method="get">
-                                                            @csrf
-                                                            <input type="hidden" name="item" value="{{ $item->id }}">
-                                                            <button class="btn btn-sm btn-dark">
-                                                                <i class="fa fa-trash text-danger"></i>
-                                                            </button>
-                                                        </form>
-
-                                                        <form action="" class="m-1" method="get">
-                                                            @csrf
-                                                            <input type="hidden" name="item" value="{{ $item->id }}">
-                                                            <button class="btn btn-sm btn-dark">
-                                                                <i class="fa fa-toggle-on text-success"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                    
                                                 </td>
                                             </tr>
-
                                         @empty
                                             <tr>
                                                 <td colspan="7"><span class="text-danger">no items to display</span></td>
