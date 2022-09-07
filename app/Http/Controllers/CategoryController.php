@@ -103,9 +103,15 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         //Delete category
-        $category = Category::find($id);
-        $category->delete();
-
-        return redirect()->route('categories.index')->with('message', 'Category deleted successfully');
+        try {
+            //code...
+            $category = Category::find($id);
+            $category->delete();
+            $msg = 'Category deleted successfully';
+        } catch (\Throwable $th) {
+            $msg = 'Faild to deleted category';
+        }
+        
+        return redirect()->route('categories.index')->with('message', $msg);
     }
 }

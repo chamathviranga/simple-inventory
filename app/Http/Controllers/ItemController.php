@@ -24,7 +24,9 @@ class ItemController extends Controller
 
     private function listItems()
     {
-        return Item::paginate(10);
+        //return Item::paginate(10);
+        //return Item::with('category')->paginate(10);
+        return Item::select('items.*','categories.name as cat_name')->join('categories','categories.id','=','items.category')->paginate(10);
     }
 
     private function getCategories()
@@ -37,7 +39,7 @@ class ItemController extends Controller
         $newImageName = "";
         if ($request->hasFile('image')) {
             $newImageName = md5(time()) . '.' . $request->image->extension();
-            Storage::putFileAs($this->$imagePath, $request->file('image'), $newImageName, 'public');
+            Storage::putFileAs($this->imagePath, $request->file('image'), $newImageName, 'public');
         }
         return $newImageName;
     }

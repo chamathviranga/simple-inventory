@@ -190,17 +190,18 @@
                                     <tbody>
 
                                         @forelse ($itemList as $index => $item)
-                                            <tr>
+                                        
+                                        <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $item->name }}</td>
-                                                <td>{{ $item->category }}</td>
+                                                <td>{{ $item->cat_name }}</td>
                                                 <td>{{ $item->description }}</td>
                                                 <td>
                                                     <img style="width:100px;height:100px"
                                                         src="{{ asset('storage/images/items/' . $item->image) }}"
                                                         alt="" srcset="">
                                                 </td>
-                                                <td>{!! $item->isActive == 0
+                                                <td>{!! $item->is_active == 0
                                                     ? "<span class='badge badge-small badge-secondary'>deactivated</span>"
                                                     : "<span class='badge badge-small badge-success'>active</span>" !!}</td>
                                                 <td class="text-center">
