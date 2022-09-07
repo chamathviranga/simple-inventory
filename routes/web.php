@@ -40,6 +40,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
 
+    //Categories
     Route::resource('/categories','App\Http\Controllers\CategoryController');
+    //Stock
+    Route::resource('/stock','App\Http\Controllers\StockController');
 
 });

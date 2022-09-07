@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Models\Stock;
+
 class StockController extends Controller
 {
     /**
@@ -13,7 +15,8 @@ class StockController extends Controller
      */
     public function index()
     {
-        //
+        $stockList = Stock::select('stocks.*','items.name')->join('items','items.id','=','stocks.item_id')->paginate(10);
+        return view('stock',compact('stockList'));
     }
 
     /**

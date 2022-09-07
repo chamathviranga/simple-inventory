@@ -19,7 +19,7 @@ class ItemController extends Controller
     {
         $itemList = $this->listItems();
         $categories = $this->getCategories();
-        return view('item-list', ['itemList' => $itemList, 'categories' => $categories]);
+        return view('item-list', compact('itemList','categories'));
     }
 
     private function listItems()
