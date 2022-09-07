@@ -1,6 +1,6 @@
 @extends('layouts.layout')
+@section('categories','active')
 @section('title', 'Items')
-
 @section('content')
 
     <!-- Modal: create update -->
