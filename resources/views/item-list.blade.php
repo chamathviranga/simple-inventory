@@ -18,6 +18,7 @@
                 <div class="modal-body">
                     <form id="add-new-item" method="POST" action="{{ route('item.add') }}" enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="_method" id="_method-create-update" value="POST">
                         <div class="form-group">
                             <label for="category">Category</label>
                             <select class="form-control @error('category') is-invalid @enderror" name="category"
@@ -63,9 +64,14 @@
                             @enderror
                         </div>
 
+                        <div class="form-group" style="display:none" id="display-current-image">
+                            <img src="" style="width:100%" alt="current-image" id="current-image">
+                        </div>
+
                         <div class="form-group">
                             <label for="image">Image</label>
-                            <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                            <input type="file" name="image" id="image"
+                                class="form-control @error('image') is-invalid @enderror" accept="image/*">
 
                             @error('description')
                                 <span class="invalid-feedback" role="alert">
@@ -80,6 +86,33 @@
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" onclick="$('#add-new-item').submit()">Save
                         changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal: delete confirmation-->
+    <div class="modal fade" id="deleteItem" tabindex="-1" role="dialog" aria-labelledby="deleteItemLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="deleteItemLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="item-delete" method="POST" action="">
+                        @csrf
+                        <input type="hidden" name="_method" id="_method-delete" value="DELETE">
+                        <h6 class="text-danger">Do you really want to delete this item ?</h6>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" onclick="$('#item-delete').submit()">Confirm</button>
                 </div>
             </div>
         </div>
@@ -136,8 +169,8 @@
                               </div> --}}
 
                                 <div class="card-tools">
-                                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addNewItem"><i
-                                            class="fas fa-plus"></i> Add new item</button>
+                                    <button class="btn btn-primary btn-sm" data-toggle="modal"
+                                        data-target="#addNewItem"><i class="fas fa-plus"></i> Add new item</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -163,7 +196,9 @@
                                                 <td>{{ $item->category }}</td>
                                                 <td>{{ $item->description }}</td>
                                                 <td>
-                                                    <img style="width:100px;height:100px" src="{{ asset('storage/images/items/'.$item->image) }}" alt="" srcset="">
+                                                    <img style="width:100px;height:100px"
+                                                        src="{{ asset('storage/images/items/' . $item->image) }}"
+                                                        alt="" srcset="">
                                                 </td>
                                                 <td>{!! $item->isActive == 0
                                                     ? "<span class='badge badge-small badge-secondary'>deactivated</span>"
@@ -171,16 +206,25 @@
                                                 <td class="text-center">
 
                                                     <button class="btn btn-sm btn-dark" data-toggle="modal"
-                                                        data-target="#addNewItem">
+                                                        data-target="#addNewItem"
+                                                        onclick="getSelectedItem('{{ route('item.item',['item' => $item->id]) }}')">
                                                         <i class="fa fa-file text-primary"></i>
                                                         <span class="">Open</span>
+                                                    </button>
+
+                                                    <button class="btn btn-sm btn-dark" data-toggle="modal"
+                                                        data-target="#deleteItem"
+                                                        onclick="confirmItemDelete( {{ $item->id }} )">
+                                                        <i class="fa fa-trash text-danger"></i>
+                                                        <span class="">Remove</span>
                                                     </button>
 
                                                 </td>
                                             </tr>
                                         @empty
-                                            <tr>
-                                                <td colspan="7"><span class="text-danger">no items to display</span></td>
+                                            <tr class="text-center">
+                                                <td colspan="7"><span class="text-danger">no items to display</span>
+                                                </td>
                                             </tr>
                                         @endforelse
 
@@ -209,11 +253,72 @@
 @endsection
 
 @push('script')
-    @if (!empty($errors->first()))
-        <script type="text/javascript">
+    <script type="text/javascript">
+        @if (!empty($errors->first()))
             $('#addNewItem').modal({
                 show: true
             });
-        </script>
-    @endif
+        @endif
+
+
+        //Change form mode : POST / PUT
+        const changeSubmitMethod = (id = null, reqMethod = 'update') => {
+
+            if (reqMethod === 'update' && id === null) return false;
+
+            let requestType = 'POST';
+            let requestAPI = '{{ route('item.add') }}';
+
+            if (reqMethod == 'update') {
+                requestType = 'PUT';
+                requestAPI = '{{ route('item.update', ['item' => '_item_']) }}';
+            }
+
+            document.getElementById('_method-create-update').value = requestType;
+            document.getElementById('add-new-item').setAttribute('action', requestAPI.replace('_item_', id));
+        }
+
+
+        //Get category data: callback
+        const setItemValuesToEdit = (responseObj) => {
+            if (responseObj != null) {
+                document.getElementById('category').selectedIndex = responseObj.category;
+                document.getElementById('name').value = responseObj.name;
+                document.getElementById('description').value = responseObj.description;
+
+                if(responseObj.image != null) {
+                    document.getElementById('display-current-image').style.display = 'block';
+                    document.getElementById('current-image').src = '{{ asset('storage/images/items') }}/' + responseObj.image;
+                }
+
+
+                changeSubmitMethod(id = responseObj.id, reqMethod = 'update');
+            }
+        }
+
+        //Get category data
+        const getSelectedItem = async (requestAPI) => {
+            await fetch(requestAPI, {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                })
+                .then(response => response.json())
+                .then(responseJson => setItemValuesToEdit(responseJson));
+        }
+
+        //Reset form to : create new
+        $('#addNewItem').on('hidden.bs.modal', function() {
+            changeSubmitMethod(id = null, reqMethod = 'create')
+        });
+
+        //Category delete confirmation
+        const confirmItemDelete = (id) => {
+            let requestAPI = '{{ route('item.delete', ['item' => '_item_']) }}';
+            document.getElementById('item-delete').setAttribute('action', requestAPI.replace('_item_', id));
+        }
+
+        //Reset category delete confirmation form action
+        $('#deleteItem').on('hidden.bs.modal', function() {
+            document.getElementById('item-delete').setAttribute('action', '');
+        });
+    </script>
 @endpush

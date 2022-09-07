@@ -25,26 +25,21 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-    //Items
     Route::group(['prefix' => 'item', 'as' => 'item.'], function () {
         Route::get('/list', [App\Http\Controllers\ItemController::class, 'index'])->name('list');
-        Route::get('/{id}', [App\Http\Controllers\ItemController::class, 'item'])->name('item');
+        Route::get('/{item}', [App\Http\Controllers\ItemController::class, 'item'])->name('item');
         Route::post('/add-new', [App\Http\Controllers\ItemController::class, 'add'])->name('add');
-        Route::delete('/delete/{id}', [App\Http\Controllers\ItemController::class, 'delete'])->name('delete');
-        Route::put('/update/{id}', [App\Http\Controllers\ItemController::class, 'update'])->name('update');
-
+        Route::delete('/delete/{item}', [App\Http\Controllers\ItemController::class, 'delete'])->name('delete');
+        Route::put('/update/{item}', [App\Http\Controllers\ItemController::class, 'update'])->name('update');
 
         // Route::get('/', [App\Http\Controllers\ItemController::class, 'index'])->name('list');
         // Route::get('/{id}', [App\Http\Controllers\ItemController::class, 'getItem'])->name('item');
         // Route::post('/', [App\Http\Controllers\ItemController::class, 'add'])->name('add');
         // Route::delete('/{id}', [App\Http\Controllers\ItemController::class, 'delete'])->name('delete');
         // Route::put('/{id}', [App\Http\Controllers\ItemController::class, 'update'])->name('update');
-
     });
 
-    //Categories
-    Route::group(['prefix' => 'category', 'as' => 'category.'], function () {
-        Route::get('/list', [App\Http\Controllers\ItemController::class, 'index'])->name('category-list');
-        Route::post('/add-new', [App\Http\Controllers\ItemController::class, 'addNewItem'])->name('add-new-category');
-    });
+
+    Route::resource('/categories','App\Http\Controllers\CategoryController');
+
 });
