@@ -1,6 +1,6 @@
 @extends('layouts.layout')
+@section('categories','active')
 @section('title', 'Items')
-
 @section('content')
 
     <!-- Modal: create update -->
@@ -161,7 +161,7 @@
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $category->name }}</td>
                                                 <td>{{ $category->description }}</td>
-                                                <td>{!! $category->isActive == 0
+                                                <td>{!! $category->is_active == 0
                                                     ? "<span class='badge badge-small badge-secondary'>deactivated</span>"
                                                     : "<span class='badge badge-small badge-success'>active</span>" !!}</td>
                                                 <td class="text-center">

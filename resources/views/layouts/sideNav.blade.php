@@ -25,7 +25,7 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
            
                         <li class="nav-item">
-                            <a href="{{ route('dashboard') }}" class="nav-link">
+                            <a href="{{ route('dashboard') }}" class="nav-link @yield('dashboard')">
                                 <i class="nav-icon fas fa-list"></i>
                                 <p>
                                     Dashboard
@@ -35,7 +35,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('item.list') }}" class="nav-link">
+                            <a href="{{ route('item.list') }}" class="nav-link @yield('items')">
                                 <i class="nav-icon fas fa-list"></i>
                                 <p>
                                     Items
@@ -45,10 +45,20 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('categories.index') }}" class="nav-link">
+                            <a href="{{ route('categories.index') }}" class="nav-link @yield('categories')">
                                 <i class="nav-icon fas fa-list"></i>
                                 <p>
                                     Categories
+                                    {{-- <span class="right badge badge-danger">New</span> --}}
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link @yield('stock')">
+                                <i class="nav-icon fas fa-list"></i>
+                                <p>
+                                    Stock
                                     {{-- <span class="right badge badge-danger">New</span> --}}
                                 </p>
                             </a>
