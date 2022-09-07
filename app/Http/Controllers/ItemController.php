@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Storage;
 class ItemController extends Controller
 {
 
+    private $imagePath = 'public/images/items';
+
+
     //List all items
     public function index()
     {
@@ -29,6 +32,16 @@ class ItemController extends Controller
         return Category::all();
     }
 
+
+    private function uploadImage($request) {
+        $newImageName = "";
+        if ($request->hasFile('image')) {
+            $newImageName = md5(time()) . '.' . $request->image->extension();
+            Storage::putFileAs($this->$imagePath, $request->file('image'), $newImageName, 'public');
+        }
+        return $newImageName;
+    }
+
     //Add item
     public function add(Request $request)
     {
@@ -39,40 +52,50 @@ class ItemController extends Controller
             'image' => 'required|mimes:jpg,jpeg,png'
         ]);
 
-
-        //if ($request->hasFile('image')) $newImageName = $request->file('image')->store('images/items');
-        if ($request->hasFile('image')) {
-
-            $storagePath = 'public/images/items';
-            $newImageName= md5(time()).'.'.$request->image->extension();
-            Storage::putFileAs($storagePath,$request->file('image'),$newImageName,'public');
-        }
-
         $data = $request->all();
-        $data['image'] = $newImageName ?? "";
+        $data['image'] = $this->uploadImage($request);
         Item::create($data);
 
         return redirect()->route('item.list')->with('message', 'New Item created successfully');
     }
 
     //Update item
-    public function update(Request $request)
+    public function update(Request $request,$id)
     {
-        $item = new Item();
+
+        $request->validate([
+            'category' => 'required',
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'image' => 'required|mimes:jpg,jpeg,png'
+        ]);
+
+        $item = Item::find($id);
         $item->name = $request->name;
         $item->category = $request->category;
         $item->description = $request->description;
-        $item->image = "null";
+        $item->image = $this->uploadImage($request);
         $item->isActive = 1;
+
+        $item->save();
+
+        return redirect()->route('item.list')->with('message', 'Item updated successfully');
     }
 
     //Delete item
-    public function delete()
+    public function delete($id)
     {
+        $item = Item::find($id);
+        Storage::delete($this->imagePath.'/'.$item->image);
+        $item->delete();
+
+        return redirect()->route('item.list')->with('message', 'Item deleted successfully');
     }
 
     //Get single item
-    public function item()
+    public function item($id)
     {
+        $item = Item::where('id',$id)->first();
+        echo json_encode($item);
     }
 }
