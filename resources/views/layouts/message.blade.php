@@ -1,5 +1,5 @@
 @if ($message = session()->pull('message'))
-    <div class="alert alert-{{ ($type = session()->pull('type')) ?? 'success' }} alert-dismissible fade show"
+    <div class="alert alert-{{ ($type = session()->pull('type')) == 'success' ? 'success' : 'danger' }} alert-dismissible fade show"
         role="alert">
         <strong class="d-flex align-items-center"> <i class="fe fe-{{ $type ? 'slash' : 'check-circle' }}"></i>
             {!! $message !!}</strong>
