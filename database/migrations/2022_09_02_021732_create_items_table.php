@@ -17,11 +17,11 @@ class CreateItemsTable extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name',50);
-            $table->unsignedBigInteger('category');
+            $table->unsignedBigInteger('category_id');
             $table->string('description',255);
             $table->string('image',255);
             $table->boolean('is_active')->default(true);
-            $table->foreign('category')->references('id')->on('categories');
+            $table->foreign('category_id')->references('id')->on('categories');
         });
     }
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Exception;
+
 class CategoryController extends Controller
 {
     /**
@@ -14,7 +16,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categoryList = Category::paginate(10);
-        return view('category-list',compact('categoryList'));
+        return view('category-list', compact('categoryList'));
     }
 
     /**
@@ -35,15 +37,24 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|min:3|max:50',
-            'description' => 'required|max:255'
-        ]);
 
-        $data = $request->all();
-        Category::create($data);
+        try {
+            $request->validate([
+                'name' => 'required|min:3|max:50',
+                'description' => 'required|max:255'
+            ]);
 
-        return redirect()->route('categories.index')->with('message', 'New Category created successfully');
+            $data = $request->all();
+            Category::create($data);
+
+            return redirect()->route('categories.index')
+                ->with('type', 'success')
+                ->with('message', 'New Category created successfully');
+        } catch (Exception $e) {
+            return redirect()->route('categories.index')
+                ->with('type', 'error')
+                ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to create new category');
+        }
     }
 
     /**
@@ -54,7 +65,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        // view only
     }
 
     /**
@@ -65,8 +76,12 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        $category = Category::where('id',$id)->first();
-        echo json_encode($category);
+        try {
+            $category = Category::where('id', $id)->first();
+            echo json_encode($category);
+        } catch (Exception $e) {
+            echo  env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to retrieve the category';
+        }
     }
 
     /**
@@ -79,19 +94,26 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
 
-        $request->validate([
-            'name' => 'required|min:3|max:50',
-            'description' => 'required|max:255'
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|min:3|max:50',
+                'description' => 'required|max:255'
+            ]);
 
-        $category = Category::find($id);
-        $category->name = $request->name;
-        $category->description = $request->description;
+            $category = Category::find($id);
+            $category->name = $request->name;
+            $category->description = $request->description;
 
-        $category->save();
+            $category->save();
 
-        return redirect()->route('categories.index')->with('message', 'Category updated successfully');
-        
+            return redirect()->route('categories.index')
+                ->with('type', 'success')
+                ->with('message', 'Category updated successfully');
+        } catch (Exception $e) {
+            return redirect()->route('categories.index')
+                ->with('type', 'error')
+                ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to update category');
+        }
     }
 
     /**
@@ -104,14 +126,17 @@ class CategoryController extends Controller
     {
         //Delete category
         try {
-            //code...
             $category = Category::find($id);
             $category->delete();
-            $msg = 'Category deleted successfully';
-        } catch (\Throwable $th) {
-            $msg = 'Faild to deleted category';
+
+            return redirect()->route('categories.index')
+            ->with('type','success')
+            ->with('message', 'Category deleted successfully');
+        } catch (Exception $e) {
+            return redirect()->route('categories.index')
+            ->with('type','error')
+            ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to delete category');
         }
-        
-        return redirect()->route('categories.index')->with('message', $msg);
+
     }
 }
