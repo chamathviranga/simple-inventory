@@ -21,12 +21,12 @@
                         <input type="hidden" name="_method" id="_method-create-update" value="POST">
                         <div class="form-group">
                             <label for="category">Category</label>
-                            <select class="form-control @error('category') is-invalid @enderror" name="category"
+                            <select class="form-control @error('category_id') is-invalid @enderror" name="category_id"
                                 id="category">
                                 <option value="">Choose</option>
                                 @if (!empty($categories))
                                     @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ Str::ucfirst($category->name) }}</option>
+                                        <option {{ old('category_id') == $category->id ? 'selected' : null }} value="{{ $category->id }}">{{ Str::ucfirst($category->name) }}</option>
                                     @endforeach
                                 @endif
                             </select>
@@ -55,7 +55,7 @@
                             <label for="description">Description</label>
                             <textarea name="description" id="description" cols="5"
                                 class="form-control @error('description') is-invalid @enderror"
-                                placeholder="Lorem Ipsum is simply dummy text of the printing ..."></textarea>
+                                placeholder="Lorem Ipsum is simply dummy text of the printing ...">{{ old('description') }}</textarea>
 
                             @error('description')
                                 <span class="invalid-feedback" role="alert">
@@ -194,7 +194,7 @@
                                         <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $item->name }}</td>
-                                                <td>{{ $item->cat_name }}</td>
+                                                <td>{{ $item->category->name }}</td>
                                                 <td>{{ $item->description }}</td>
                                                 <td>
                                                     <img style="width:100px;height:100px"
@@ -283,7 +283,7 @@
         //Get category data: callback
         const setItemValuesToEdit = (responseObj) => {
             if (responseObj != null) {
-                document.getElementById('category').selectedIndex = responseObj.category;
+                document.getElementById('category').selectedIndex = responseObj.category_id;
                 document.getElementById('name').value = responseObj.name;
                 document.getElementById('description').value = responseObj.description;
 

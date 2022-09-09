@@ -55,7 +55,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link @yield('stock')">
+                            <a href="{{ route('stock.index') }}" class="nav-link @yield('stocks')">
                                 <i class="nav-icon fas fa-list"></i>
                                 <p>
                                     Stock

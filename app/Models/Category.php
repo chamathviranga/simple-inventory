@@ -13,7 +13,7 @@ class Category extends Model
     protected $fillable = ['name','description','isActive'];
 
     public function item() {
-        return $this->hasMany(Item::class,'category','id');
+        return $this->hasMany(Item::class,'category_id','id');
     }
 
 }
