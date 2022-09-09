@@ -283,7 +283,7 @@
         //Get category data: callback
         const setItemValuesToEdit = (responseObj) => {
             if (responseObj != null) {
-                document.getElementById('category').selectedIndex = responseObj.category;
+                document.getElementById('category').selectedIndex = responseObj.category_id;
                 document.getElementById('name').value = responseObj.name;
                 document.getElementById('description').value = responseObj.description;
 

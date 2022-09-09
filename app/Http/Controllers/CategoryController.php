@@ -65,7 +65,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        // view only
     }
 
     /**
@@ -112,7 +112,7 @@ class CategoryController extends Controller
         } catch (Exception $e) {
             return redirect()->route('categories.index')
                 ->with('type', 'error')
-                ->with('message', 'Faild to update category');
+                ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to update category');
         }
     }
 
@@ -132,10 +132,10 @@ class CategoryController extends Controller
             return redirect()->route('categories.index')
             ->with('type','success')
             ->with('message', 'Category deleted successfully');
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             return redirect()->route('categories.index')
             ->with('type','error')
-            ->with('message', 'Faild to delete category');
+            ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to delete category');
         }
 
     }

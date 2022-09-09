@@ -82,15 +82,15 @@ class ItemController extends Controller
                 'category_id' => 'required',
                 'name' => 'required|string',
                 'description' => 'required|string',
-                'image' => 'required|mimes:jpg,jpeg,png'
+                'image' => 'mimes:jpg,jpeg,png'
             ]);
     
             $item = Item::find($id);
             $item->name = $request->name;
             $item->category_id = $request->category_id;
             $item->description = $request->description;
-            $item->image = $this->uploadImage($request);
-            $item->isActive = 1;
+            if($request->has('image')) $item->image = $this->uploadImage($request);
+            $item->is_active = 1;
     
             $item->save();
     

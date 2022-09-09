@@ -42,7 +42,10 @@ Route::middleware(['auth'])->group(function () {
 
     //Categories
     Route::resource('/categories','App\Http\Controllers\CategoryController');
+    
     //Stock
     Route::resource('/stock','App\Http\Controllers\StockController');
+
+    Route::post('/stock/searchItems',[App\Http\Controllers\StockController::class,'searchItem'])->name('stock-enter-search-item');
 
 });
