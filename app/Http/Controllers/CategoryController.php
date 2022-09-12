@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Category;
-use Exception;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -38,23 +37,17 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
 
-        try {
-            $request->validate([
-                'name' => 'required|min:3|max:50',
-                'description' => 'required|max:255'
-            ]);
+        $request->validate([
+            'name' => 'required|min:3|max:50',
+            'description' => 'required|max:255',
+        ]);
 
-            $data = $request->all();
-            Category::create($data);
+        $data = $request->all();
+        Category::create($data);
 
-            return redirect()->route('categories.index')
-                ->with('type', 'success')
-                ->with('message', 'New Category created successfully');
-        } catch (Exception $e) {
-            return redirect()->route('categories.index')
-                ->with('type', 'error')
-                ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to create new category');
-        }
+        return redirect()->route('categories.index')
+            ->with('message', 'New Category created successfully');
+
     }
 
     /**
@@ -76,12 +69,9 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        try {
-            $category = Category::where('id', $id)->first();
-            echo json_encode($category);
-        } catch (Exception $e) {
-            echo  env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to retrieve the category';
-        }
+        $category = Category::where('id', $id)->first();
+        echo json_encode($category);
+
     }
 
     /**
@@ -94,26 +84,20 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
 
-        try {
-            $request->validate([
-                'name' => 'required|min:3|max:50',
-                'description' => 'required|max:255'
-            ]);
+        $request->validate([
+            'name' => 'required|min:3|max:50',
+            'description' => 'required|max:255',
+        ]);
 
-            $category = Category::find($id);
-            $category->name = $request->name;
-            $category->description = $request->description;
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->description = $request->description;
 
-            $category->save();
+        $category->save();
 
-            return redirect()->route('categories.index')
-                ->with('type', 'success')
-                ->with('message', 'Category updated successfully');
-        } catch (Exception $e) {
-            return redirect()->route('categories.index')
-                ->with('type', 'error')
-                ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to update category');
-        }
+        return redirect()->route('categories.index')
+            ->with('message', 'Category updated successfully');
+
     }
 
     /**
@@ -125,18 +109,11 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         //Delete category
-        try {
-            $category = Category::find($id);
-            $category->delete();
+        $category = Category::find($id);
+        $category->delete();
 
-            return redirect()->route('categories.index')
-            ->with('type','success')
+        return redirect()->route('categories.index')
             ->with('message', 'Category deleted successfully');
-        } catch (Exception $e) {
-            return redirect()->route('categories.index')
-            ->with('type','error')
-            ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to delete category');
-        }
 
     }
 }
