@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Models\Stock;
 use App\Models\Item;
-use Exception;
+use App\Models\Stock;
+use Illuminate\Http\Request;
 
 class StockController extends Controller
 {
@@ -17,8 +15,8 @@ class StockController extends Controller
      */
     public function index()
     {
-        $stockList = Stock::select('stocks.*','items.name')->join('items','items.id','=','stocks.item_id')->paginate(10);
-        return view('stock',compact('stockList'));
+        $stockList = Stock::select('stocks.*', 'items.name')->join('items', 'items.id', '=', 'stocks.item_id')->paginate(10);
+        return view('stock', compact('stockList'));
     }
 
     /**
@@ -40,26 +38,17 @@ class StockController extends Controller
     public function store(Request $request)
     {
 
-        try {
-            // $request->validate([
-            //     'item_id' => 'required',
-            //     'qty' => 'require|integer'
-            // ]);
-    
-            $data = $request->all();
-            $data['item_id'] = explode(':',$request->item_id)[0];
-            Stock::create($data);
-           
-            return redirect()->route('stock.index')
-            ->with('type','success')
+        $request->validate([
+            'item_id' => 'required',
+            'qty' => 'required|integer|min:0|max:9999',
+        ]);
+
+        $data = $request->all();
+        $data['item_id'] = explode(':', $request->item_id)[0];
+        Stock::create($data);
+
+        return redirect()->route('stock.index')
             ->with('message', 'Item added to the stock');
-
-        } catch (Exception $e) {
-            return redirect()->route('stock.index')
-            ->with('type','error')
-            ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Item added to the stock');
-        }
-
 
     }
 
@@ -82,14 +71,8 @@ class StockController extends Controller
      */
     public function edit($id)
     {
-        try {
-            
-            $stock = Stock::where('id',$id)->with('item')->first();
-            echo json_encode($stock);
-
-        } catch (Exception $e) {
-            echo  env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to retrieve the stock';
-        }
+        $stock = Stock::where('id', $id)->with('item')->first();
+        echo json_encode($stock);
     }
 
     /**
@@ -101,24 +84,16 @@ class StockController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
-            $request->validate([
-                'qty' => 'required|integer'
-            ]);
-    
-            $stock = Stock::find($id);
-            $stock->qty = $request->qty;
-            $stock->save();
-           
-            return redirect()->route('stock.index')
-            ->with('type','success')
-            ->with('message', 'Stock updated');
+        $request->validate([
+            'qty' => 'required|integer|min:0|max:9999',
+        ]);
 
-        } catch (Exception $e) {
-            return redirect()->route('stock.index')
-            ->with('type','error')
-            ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to update the stock');
-        }
+        $stock = Stock::find($id);
+        $stock->qty = $request->qty;
+        $stock->save();
+
+        return redirect()->route('stock.index')
+            ->with('message', 'Stock updated');
     }
 
     /**
@@ -129,29 +104,22 @@ class StockController extends Controller
      */
     public function destroy($id)
     {
-        try {
-            $stock = Stock::find($id);
-            $stock->delete();
+        $stock = Stock::find($id);
+        $stock->delete();
 
-            return redirect()->route('stock.index')
-            ->with('type','success')
+        return redirect()->route('stock.index')
             ->with('message', 'Item removed from the stock');
-        } catch (Exception $e) {
-            return redirect()->route('stock.index')
-            ->with('type','error')
-            ->with('message', env('APP_DEBUG') == true ? $e->getMessage() : 'Faild to remove item from stock');
-        }
     }
 
-    public function searchItem(Request $request) {
-
+    public function searchItem(Request $request)
+    {
         $request->validate([
-            'search' => 'required|String'
+            'search' => 'required|String',
         ]);
 
-        $items = Item::select('id','name')->where('name','like',$request->search.'%')->where('is_active',1)
-        ->get();
+        $items = Item::select('id', 'name')->where('name', 'like', $request->search . '%')->where('is_active', 1)
+            ->get();
 
-         echo json_encode($items);
+        echo json_encode($items);
     }
 }

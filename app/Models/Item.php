@@ -16,7 +16,7 @@ class Item extends Model
     }
 
     public function stock() {
-        return $this->belongsTo(Stock::class);
+        return $this->hasOne(Stock::class);
     }
 
 

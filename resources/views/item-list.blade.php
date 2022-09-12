@@ -64,8 +64,8 @@
                             @enderror
                         </div>
 
-                        <div class="form-group" style="display:none" id="display-current-image">
-                            <img src="" style="width:100%" alt="current-image" id="current-image">
+                        <div class="form-group text-center" style="display:none" id="display-current-image">
+                            <img src="" style="max-width:200px;height:auto;" alt="current-image" id="current-image">
                         </div>
 
                         <div class="form-group">
@@ -197,7 +197,7 @@
                                                 <td>{{ $item->category->name }}</td>
                                                 <td>{{ $item->description }}</td>
                                                 <td>
-                                                    <img style="width:100px;height:100px"
+                                                    <img style="width:100px;height:auto"
                                                         src="{{ asset('storage/images/items/' . $item->image) }}"
                                                         alt="" srcset="">
                                                 </td>
