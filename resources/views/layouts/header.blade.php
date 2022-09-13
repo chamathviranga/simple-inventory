@@ -32,4 +32,9 @@
     <!-- summernote -->
     <link rel="stylesheet" href="{{ URL::asset('plugins/summernote/summernote-bs4.min.css') }}" />
 
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <!-- Scripts -->
+    <script src="{{ asset('js/app.js') }}" defer></script>
+
 </head>
