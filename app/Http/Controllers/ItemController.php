@@ -15,17 +15,26 @@ class ItemController extends Controller
     //List all items
     public function index()
     {
+        return view('item-list');
+    }
+
+    public function axiosGetTableData()
+    {
         $itemList = $this->listItems();
+        return Response()->json($itemList, 200);
+    }
+
+    public function axiosGetCategories()
+    {
         $categories = $this->getCategories();
-        return view('item-list', compact('itemList', 'categories'));
+        return Response()->json($categories, 200);
     }
 
     private function listItems()
     {
-        //return Item::paginate(10);
-        //return Item::select('items.*','categories.name as cat_name')->join('categories','categories.id','=','items.category')->paginate(10);
-        return Item::with('category')->paginate(10);
-
+        return Item::with(['category:categories.name as cat_name'])
+            ->select('items.id', 'items.name', 'items.description', 'items.image', 'items.is_active')
+            ->paginate(10);
     }
 
     private function getCategories()

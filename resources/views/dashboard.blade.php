@@ -24,7 +24,7 @@
 
                     <div class="row">
                         
-                        <info-box 
+                        {{-- <info-box 
                         :count=150
                         info-label="Items"
                         button-name="More info"
@@ -54,6 +54,14 @@
                         button-name="More info"
                         bg-color="bg-danger"
                         card-icon="fa fa-pie-chart"
+                        > </info-box> --}}
+
+                        <info-box 
+                        :count=44
+                        info-label="Stock"
+                        button-name="More info"
+                        bg-color="bg-warning"
+                        card-icon="fa fa-user-plus"
                         > </info-box>
                      
                     </div>
@@ -62,3 +70,11 @@
         </div>
 
 @endsection
+
+@push('script')
+   
+   <script>
+
+   </script>
+
+@endpush

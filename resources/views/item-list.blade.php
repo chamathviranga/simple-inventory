@@ -3,7 +3,7 @@
 @section('title', 'Items')
 @section('content')
 
-    <!-- Modal -->
+    <!-- Modal: add / edit-->
     <div class="modal fade" id="addNewItem" tabindex="-1" role="dialog" aria-labelledby="addNewItemLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -118,13 +118,10 @@
         </div>
     </div>
 
-
-    <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
 
         @include('layouts.message')
 
-        <!-- Content Header (Page header) -->
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
@@ -137,16 +134,11 @@
                             {{-- <li class="breadcrumb-item active">Dashboard</li> --}}
                         </ol>
                     </div>
-                    <!-- /.col -->
                 </div>
-                <!-- /.row -->
 
             </div>
-            <!-- /.container-fluid -->
         </div>
-        <!-- /.content-header -->
 
-        <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
 
@@ -173,8 +165,8 @@
                                         data-target="#addNewItem"><i class="fas fa-plus"></i> Add new item</button>
                                 </div>
                             </div>
-                            <!-- /.card-header -->
-                            <div class="card-body table-responsive p-0">
+                            
+                            {{-- <div class="card-body table-responsive p-0">
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
@@ -232,10 +224,20 @@
                                     </tbody>
                                 </table>
 
-                            </div>
-                            <!-- /.card-body -->
+                            </div> --}}
+
+
+                            <data-table
+                                update-url=""
+                                delete-url=""
+                                get-item-url="{{ route('item.item',['item' => '_item_id']) }}"
+                                all-items-url="{{ route('item.axios-list') }}"
+                                image-path="{{ asset('storage/images/items/') }}"
+                                action-btn1-data-target="addNewItem"
+                                action-btn2-data-target="deleteItem"
+                            />
+
                         </div>
-                        <!-- /.card -->
                     </div>
                 </div>
 
@@ -245,16 +247,19 @@
                     </div>
                 @endif
             </div>
-            <!-- /.container-fluid -->
         </section>
-        <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
+    
 
 @endsection
 
 @push('script')
     <script type="text/javascript">
+
+        function callback() {
+            alert('test');
+        }
+
         @if (!empty($errors->first()))
             $('#addNewItem').modal({
                 show: true

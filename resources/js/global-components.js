@@ -1,9 +1,9 @@
 Vue.component(
-    'data-table',
-    require('./components/DataTable.vue').default,
+    'info-box',
+    require('./components/Dashboard/InfoBox.vue').default,
 );
 
 Vue.component(
-    'info-box',
-    require('./components/Dashboard/InfoBox.vue').default,
+    'data-table',
+    require('./components/Common/DataTable.vue').default,
 );

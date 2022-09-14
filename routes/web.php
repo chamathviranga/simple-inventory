@@ -37,6 +37,10 @@ Route::middleware(['auth'])->group(function () {
         // Route::post('/', [App\Http\Controllers\ItemController::class, 'add'])->name('add');
         // Route::delete('/{id}', [App\Http\Controllers\ItemController::class, 'delete'])->name('delete');
         // Route::put('/{id}', [App\Http\Controllers\ItemController::class, 'update'])->name('update');
+
+        //For axios
+        Route::get('api/list', [App\Http\Controllers\ItemController::class, 'axiosGetTableData'])->name('axios-list');
+
     });
 
 
@@ -49,3 +53,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/stock/searchItems',[App\Http\Controllers\StockController::class,'searchItem'])->name('stock-enter-search-item');
 
 });
+
+?>
