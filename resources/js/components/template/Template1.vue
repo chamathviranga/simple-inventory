@@ -9,50 +9,46 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title" id="addNewItemLabel">Add new item</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click=closeModal>
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <form id="add-new-item" action="" enctype="multipart/form-data">
                         
-                        <input type="hidden" name="_method" id="_method-create-update" value="POST">
                         <div class="form-group">
                             <label for="category">Category</label>
-                            <select class="form-control" name="category_id"
-                                id="category">
+                            <select class="form-control" v-model="form.category_id" >
                                 <option value="">Choose</option>
-                                <option value=""></option>
+                                <option v-for="(category,index) in categories" :value="category.id" :key=index> {{ category.name }} </option>
                             </select>                         
                         </div>
 
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" name="name" id="name" class="form-control" placeholder="Keyboard" value="">
+                            <input type="text" class="form-control" placeholder="Keyboard" v-model="form.name" >
                         </div>
 
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea name="description" id="description" cols="5"
-                                class="form-control" placeholder="Lorem Ipsum is simply dummy text of the printing ..."></textarea>
+                            <textarea cols="5" class="form-control" placeholder="Lorem Ipsum is simply dummy text of the printing ..." v-model="form.description"></textarea>
                         </div>
 
-                        <div class="form-group" style="display:none" id="display-current-image">
-                            <img src="" style="width:100%" alt="current-image" id="current-image">
+                        <div v-if="form.image != null && form.id != null" class="form-group" id="display-current-image">
+                            <img  :src="`${this.base_url}/storage/images/items/${form.image}`" style="max-width:100px" alt="current-image" id="current-image">
                         </div>
 
                         <div class="form-group">
                             <label for="image">Image</label>
                             <input type="file" name="image" id="image"
-                                class="form-control is-invalid" accept="image/*">
+                                class="form-control is-invalid" accept="image/*" @change=getSelectedImage>
                         </div>
 
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="$('#add-new-item').submit()">Save
-                        changes</button>
+                    <button type="button" class="btn btn-secondary" @click=closeModal data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" @click=updateOrcreateItem >Save changes</button>
                 </div>
             </div>
         </div>
@@ -89,6 +85,7 @@
 
                                     <div class="card-tools">
                                         <button
+                                            @click=clearFromData
                                             class="btn btn-primary btn-sm"
                                            data-toggle="modal" data-target="#addNewItem"
                                         >
@@ -111,9 +108,9 @@
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody v-if="items.length">
 
-                                            <tr v-for="(item,index) in items" :key=index v-if="items.length" >
+                                            <tr v-for="(item,index) in items" :key=index  >
                                                 <td>{{ ++index }}</td>
                                                 <td>{{ item.name }}</td>
                                                 <td>{{ item.category.name }}</td>
@@ -126,18 +123,20 @@
                                                     
                                                 </td>
                                                 <td>
-                                                   <button @click=updateItem class="btn btn-primary btn-small"><i class="fa fa-edit"></i></button> 
+                                                   <button @click=getSelectedItemDetails(item.id) class="btn btn-primary btn-small"><i class="fa fa-edit"></i></button> 
                                                    <button @click=deleteItem(item.id) class="btn btn-primary btn-danger"><i class="fa fa-trash"></i></button> 
                                                 </td>
                                             </tr>
+                                        </tbody>
 
-                                            <tr v-else>
-                                                <td colspan="5">
+                                        <tbody v-else>
+                                            <tr>
+                                                <td colspan="6">
                                                     <span class="text-danger">Data not available</span>
                                                 </td>
                                             </tr>
-
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>
@@ -145,9 +144,13 @@
                     </div>
 
                     <!-- pagination start -->
-                    <!-- <div class="row mt-2 ml-1">
-                            pagination link list
-                        </div> -->
+                    <div class="row mt-2 ml-1" v-if="pages.length">
+                        <ul class="pagination">
+                            <li class="page-item" v-for="(page,index) in pages" :key=index>
+                                <a :class="`page-link ${ page.active ? 'bg-primary' : null }`" @click="getItems(`${ page.url != null ? page.url : null }`)" href="#" v-html=page.label ></a>
+                            </li>
+                        </ul>
+                    </div>
                     <!-- pagination end -->
                 </div>
             </section>
@@ -162,19 +165,62 @@ export default {
     data() {
         return {
             items: [],
+            pages: [],
+            categories: [],
             base_url : process.env.MIX_BASE_URL,
+            form: {
+                id: null,
+                category_id: null,
+                name : null,
+                description : null,
+                image : null,
+            }
         };
     },
 
     methods: {
-        //Get table data
-        getTableData: async function () {
-            await axios.get(`${this.base_url}/items`).then((response) => {
+
+        getItems: async function (url = null) {
+            
+            let request_url = url != null ? url : `${this.base_url}/items`;
+            
+            await axios.get(request_url).then((response) => {
                 this.items = response.data.data;
+                this.pages = response.data.links;
+                history.pushState({}, null, request_url);
             });
         },
 
-        deleteItem: async function (item_id) {
+        getSelectedItemDetails: async function (id = null) {
+            if(id != null) {
+
+                let formData = new FormData();
+                formData.append('id',id);
+
+                axios.get(`${this.base_url}/items/${id}`,formData).then((response) => {
+                    
+                    this.form.id = response.data.id;
+                    this.form.category_id = response.data.category_id;
+                    this.form.name = response.data.name;
+                    this.form.description = response.data.description;
+                    this.form.image = response.data.image;
+
+                    $("#addNewItem").modal('toggle');
+
+                }).catch((error) => {
+                    console.error(error);
+                });
+
+            }else{
+                this.$swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Item not found!',
+                });
+            }
+        },
+
+        deleteItem: async function (id) {
             this.$swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -185,64 +231,101 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.delete(`${this.base_url}/items/${item_id}`).then((response) => {
+                    axios.delete(`${this.base_url}/items/${id}`).then((response) => {
                         this.$swal.fire(
                             'Deleted!',
                             'Your item has been deleted.',
                             'success'
                         );
-                        this.getTableData();
-
+                        this.getItems();
                         console.log(response);
+                    }).catch((error) => {
+                        console.error(error);
                     });
                 }
             });
         },
 
-        updateItem: async function () {
-            this.$swal.fire({
-                title: 'Update Item',
-                input: 'text',
-                inputAttributes: {
-                    autocapitalize: 'off'
-                },
-                showCancelButton: true,
-                confirmButtonText: 'Look up',
-                showLoaderOnConfirm: true,
-                preConfirm: (login) => {
-                    return fetch(`//api.github.com/users/${login}`)
-                    .then(response => {
-                        if (!response.ok) {
-                        throw new Error(response.statusText)
-                        }
-                        return response.json()
-                    })
-                    .catch(error => {
-                        this.$swal.showValidationMessage(
-                        `Request failed: ${error}`
-                        )
-                    })
-                },
-                allowOutsideClick: () => !Swal.isLoading()
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.$swal.fire({
-                    title: `${result.value.login}'s avatar`,
-                    imageUrl: result.value.avatar_url
-                    })
-                }
+        updateOrcreateItem: async function () {
+
+            let formData = new FormData();
+            this.form.image = formData.append('image',this.form.image);
+
+            let request_url = `${this.base_url}/items`;
+            let method = 'post';
+
+            if(this.form.id != null){
+                request_url = `${this.base_url}/items/${this.form.id}`;
+                method = 'put';
+            }
+
+            console.log(this.form);
+
+            axios({
+                url : request_url,
+                method: method,
+                data : this.form,
+                // headers: {
+                //     'Content-type': 'multipart/form-data',
+                //     'Access-Control-Allow-Origin': '*',
+                // }
+            }).then((response)=>{
+                //console.log(response);
+            
+                this.$swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Your work has been saved',
+                    showConfirmButton: true,
+                    timer: 1500
+                });
+            
+            }).catch((error) => {
+                console.error(error);
+
+                this.$swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text:error,
+                    showConfirmButton: true,
+                });
+            }).finally(()=>{
+                $("#addNewItem").modal('toggle');
+                this.getItems();
+                //this.clearFromData();
+
             });
 
         },
 
-        createItem: function () {
-            serialized
-        }
+        getCategories: async function () {
+            await axios.get(`${this.base_url}/item-categories`).then((response) => {
+                this.categories = response.data;
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
 
+        getSelectedImage : function (event) {
+            this.form.image = event.target.files[0];
+        },
+
+        clearFromData : function () {
+            this.form.id = null;
+            this.form.category_id = null;
+            this.form.name = null;
+            this.form.description = null;
+            this.form.image = null;
+        },
+
+        closeModal: function () {
+            $('#addNewItem').modal('toggle');
+        }
     },
 
     async mounted() {
-        await this.getTableData();
+        await this.getItems();
+        await this.getCategories();
     },
     
 };

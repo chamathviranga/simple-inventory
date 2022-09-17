@@ -10,6 +10,9 @@ use App\Models\Category;
 
 class ItemController extends Controller
 {
+
+    private $imagePath = 'public/images/items';
+
     /**
      * Display a listing of the resource.
      *
@@ -39,10 +42,10 @@ class ItemController extends Controller
 
             //return $item;
 
-            $item = Item::with(['category'])
+            $items = Item::with(['category'])
             ->paginate(1);
 
-            return Response()->json($item,200);
+            return Response()->json($items,200);
                 
         }
 
@@ -69,7 +72,19 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'category_id' => 'required',
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'image' => 'required|mimes:jpg,jpeg,png',
+        ]);
+
+        $data = $request->all();
+
+        $data['image'] = $this->uploadImage($request);
+        Item::create($data);
+
+        return Response()->json('New Item created',200);
     }
 
     /**
@@ -80,7 +95,8 @@ class ItemController extends Controller
      */
     public function show($id)
     {
-        //
+        $item = Item::where('id', $id)->first();
+        return Response()->json($item,200);
     }
 
     /**
@@ -91,7 +107,7 @@ class ItemController extends Controller
      */
     public function edit($id)
     {
-        //
+        
     }
 
     /**
@@ -103,7 +119,29 @@ class ItemController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+                 
+        echo json_encode($request->image);exit;
+
+        $request->validate([
+            'category_id' => 'required',
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'image' => 'mimes:jpg,jpeg,png',
+        ]);
+
+        $item = Item::find($id);
+        $item->name = $request->name;
+        $item->category_id = $request->category_id;
+        $item->description = $request->description;
+        if ($request->has('image')) {
+            $item->image = $this->uploadImage($request);
+        }
+
+        $item->is_active = 1;
+
+        $item->save();
+
+        return Response()->json('Item updated',200);
     }
 
     /**
@@ -114,11 +152,27 @@ class ItemController extends Controller
      */
     public function destroy($id)
     {
-        // $item = Item::find($id);
-        // Storage::delete($this->imagePath . '/' . $item->image);
-        // $item->delete();
-
-        return response()->json('Successfully deleted - '."$id",400);
-
+        $item = Item::find($id);
+        Storage::delete($this->imagePath . '/' . $item->image);
+        $item->delete();
+        return response()->json('Successfully deleted',200);
     }
+
+    //Other requests
+    public function getCategories() {
+        $categories = Category::all(['id','name']);
+        return response()->json($categories,200);
+    }
+
+    //Image upload
+    private function uploadImage($request){
+        $newImageName = "";
+        if ($request->hasFile('image')) {
+            $newImageName = md5(time()) . '.' . $request->image->extension();
+            Storage::putFileAs($this->imagePath, $request->file('image'), $newImageName, 'public');
+        }
+        return $newImageName;
+    }
+
+
 }

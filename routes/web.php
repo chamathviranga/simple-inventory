@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
 
     //Items
     Route::resource('/items','App\Http\Controllers\ItemController');
+    Route::get('/item-categories',[App\Http\Controllers\ItemController::class,'getCategories'])->name('item-categories');
 
     //Categories
     Route::resource('/categories','App\Http\Controllers\CategoryController');
