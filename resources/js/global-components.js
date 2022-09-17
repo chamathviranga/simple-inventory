@@ -1,9 +1,11 @@
+//Template
 Vue.component(
-    'info-box',
-    require('./components/Dashboard/InfoBox.vue').default,
+    'template1',
+    require('./components/template/Template1.vue').default,
 );
 
+//Dashboard
 Vue.component(
-    'data-table',
-    require('./components/Common/DataTable.vue').default,
+    'info-box',
+    require('./components/dashboard/InfoBox.vue').default,
 );

@@ -10,6 +10,7 @@ class Item extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'category_id', 'description', 'image', 'isActive'];
+    protected $appends = ['category_name'];
 
     public function category() {
          return $this->belongsTo(Category::class,'category_id');
@@ -17,6 +18,11 @@ class Item extends Model
 
     public function stock() {
         return $this->hasOne(Stock::class);
+    }
+
+    public function getCategoryNameAttribute()
+    {
+        return $this->category->name;
     }
 
 

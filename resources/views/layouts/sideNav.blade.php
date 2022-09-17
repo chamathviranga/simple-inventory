@@ -35,7 +35,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="{{ route('item.list') }}" class="nav-link @yield('items')">
+                            <a href="{{ route('items.index') }}" class="nav-link @yield('items')">
                                 <i class="nav-icon fas fa-list"></i>
                                 <p>
                                     Items

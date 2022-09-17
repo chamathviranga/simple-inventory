@@ -25,24 +25,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-    Route::group(['prefix' => 'item', 'as' => 'item.'], function () {
-        Route::get('/list', [App\Http\Controllers\ItemController::class, 'index'])->name('list');
-        Route::get('/{item}', [App\Http\Controllers\ItemController::class, 'item'])->name('item');
-        Route::post('/add-new', [App\Http\Controllers\ItemController::class, 'add'])->name('add');
-        Route::delete('/delete/{item}', [App\Http\Controllers\ItemController::class, 'delete'])->name('delete');
-        Route::put('/update/{item}', [App\Http\Controllers\ItemController::class, 'update'])->name('update');
+    // Route::group(['prefix' => 'item', 'as' => 'item.'], function () {
+    //     Route::get('/list', [App\Http\Controllers\ItemController::class, 'index'])->name('list');
+    // });
 
-        // Route::get('/', [App\Http\Controllers\ItemController::class, 'index'])->name('list');
-        // Route::get('/{id}', [App\Http\Controllers\ItemController::class, 'getItem'])->name('item');
-        // Route::post('/', [App\Http\Controllers\ItemController::class, 'add'])->name('add');
-        // Route::delete('/{id}', [App\Http\Controllers\ItemController::class, 'delete'])->name('delete');
-        // Route::put('/{id}', [App\Http\Controllers\ItemController::class, 'update'])->name('update');
-
-        //For axios
-        Route::get('api/list', [App\Http\Controllers\ItemController::class, 'axiosGetTableData'])->name('axios-list');
-
-    });
-
+    //Items
+    Route::resource('/items','App\Http\Controllers\ItemController');
 
     //Categories
     Route::resource('/categories','App\Http\Controllers\CategoryController');
